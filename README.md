@@ -1,2 +1,3 @@
 # ICHack2024-Geosense
-Geopolitical news sentiment analyser web-app
+
+Front-End Dashboard: https://github.com/ozeidan9/geosense
