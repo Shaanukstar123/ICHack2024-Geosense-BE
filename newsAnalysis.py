@@ -7,7 +7,7 @@ llm = ChatOpenAI(openai_api_key=os.getenv('OPENAI_API_KEY'), model="gpt-3.5-turb
 
 output_parser = StrOutputParser()
 
-file = open("./webCrawler/output.json", encoding="utf8")
+file = open("./output.json", encoding="utf8")
 input = json.load(file)
 file.close()
 
@@ -19,12 +19,14 @@ filterPrompt = ChatPromptTemplate.from_messages([
 filterChain = filterPrompt | llm | output_parser
 
 filterOut = filterChain.invoke({"filterInput": json.dumps(titles)})
-print(filterOut)
+# print(filterOut)
 filteredList = json.loads(filterOut)
-print(filteredList)
+# print(filteredList)
 filteredIndexes = [int(article["id"]) for article in filteredList]
 print(filteredIndexes)
-filteredInput = json.dumps([article for article in input if article["id"] in filteredIndexes])
+filteredInputList = [article for article in input if article["id"] in filteredIndexes]
+print(len(filteredInputList))
+filteredInput = json.dumps(filteredInputList)
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", "Give me geopolitical sentiment indexes to 3 decimal places ranging from -1 to 1 continuous values for a financial analyst interested in oil."),
