@@ -14,8 +14,11 @@ class ForbesSpider(CrawlSpider):
         self.item_id = 0 
 
     rules = (
-        Rule(LinkExtractor(allow=r'/sites/.+/2024/02/'), callback='parse_item', follow=True),
+        Rule(LinkExtractor(allow=r'/sites/.+2024/(01|02)/'), callback='parse_item', follow=True),
     )
+
+
+
 
     def parse_item(self, response):
         self.item_id += 1
@@ -43,3 +46,4 @@ def run_spider():
 
 if __name__ == '__main__':
     run_spider()
+# replace
