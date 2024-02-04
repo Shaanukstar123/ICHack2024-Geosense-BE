@@ -11,31 +11,26 @@ file = open("./webCrawler/output.json")
 input = json.load(file)
 file.close()
 
-titles = [[article["id"], article["title"]] for article in input]
+titles = [{"id": article["id"], "title": article["title"]} for article in input]
 filterPrompt = ChatPromptTemplate.from_messages([
     ("system", "Filter this list to only include entries which could have any geopolitical impact on the price of oil."),
     ("user", "{filterInput}"+"output in original json format.")
 ])
 filterChain = filterPrompt | llm | output_parser
 
-filteredOutput = filterChain.invoke({"filterInput": titles})
+filteredList = json.load(filterChain.invoke({"filterInput": json.dumps(titles)}))
+print(filteredList)
+filteredIndexes = [article["id"] for article in filteredList]
+print(filteredIndexes)
+filteredInput = json.dumps([article for article in input if article["id"] in filteredIndexes])
 
-print(filteredOutput)
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "Give me geopolitical sentiment indexes to 3 decimal places ranging from -1 to 1 continuous values for a financial analyst interested in oil."),
+    ("system", "Give me the countries that each sentiment is referring to. Provide the output in JSON form id: , countries: [], sentiment indexes: []"),
+    ("user", "{input}")
+])
+chain = prompt | llm | output_parser
 
+output = chain.invoke({"input": filteredInput})
 
-# TODO: Take the filtered list and get the full articles back then iterate through all of them and feed them to the LLM
-# for 
-
-
-
-
-# prompt = ChatPromptTemplate.from_messages([
-#     ("system", "Give me geopolitical sentiment indexes to 3 decimal places ranging from -1 to 1 continuous values for a financial analyst interested in oil."),
-#     ("system", "Give me the countries that each sentiment is referring to. Provide the output in JSON form id: , countries: [], sentiment indexes: []"),
-#     ("user", "{input}")
-# ])
-# chain = prompt | llm | output_parser
-
-# output = chain.invoke({"input": filteredOutput})
-
-# output
+print(output)
