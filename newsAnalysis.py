@@ -52,6 +52,7 @@ def analyse():
 
     print("Updating filtered articles with summaries...")
     summarisedInput = update_json_with_summaries(filteredArticles)
+    print(summarisedInput)
 
     print("Defining sentiment analysis prompt and chain...")
     prompt = ChatPromptTemplate.from_messages([
