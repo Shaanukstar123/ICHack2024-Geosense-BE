@@ -86,5 +86,3 @@ def analyse():
 
     with open('finalOutput.json', 'w') as f:
         json.dump(final_output, f)
-
-analyse()
