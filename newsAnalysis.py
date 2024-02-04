@@ -55,14 +55,16 @@ def analyse():
 
     print("Defining sentiment analysis prompt and chain...")
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "Give me geopolitical sentiment indexes to 3 decimal places ranging from -1 to 1 continuous values for a financial analyst interested in oil. Also provide a short reason justifying the sentiment value."),
+        ("system", "Give me geopolitical sentiment indexes to 3 decimal places ranging from -1 to 1 continuous values for a financial analyst interested in oil. Also provide a short reason justifying the sentiment value. If nothing related is found, return the closest values."),
         ("system", "Give me the two letter country codes of the country that each sentiment is referring to. Provide the output in JSON form id: , countries: [], sentiment indexes: [], reason: "),
         ("user", "{input}")
     ])
     chain = prompt | llm | output_parser
 
     print("Invoking sentiment analysis chain with filtered and summarized articles...")
-    output = json.loads(chain.invoke({"input": json.dumps(summarisedInput)}))
+    chainOut = chain.invoke({"input": json.dumps(summarisedInput)})
+    print(chainOut)
+    output = json.loads(chainOut)
 
     print("2nd Final output:")
     print(output)
@@ -78,7 +80,7 @@ def analyse():
                 "message": item["reason"]
             }
 
-    print("2nd Final output:")
+    print("Final output:")
     print(final_output)
 
     with open('finalOutput.json', 'w') as f:
