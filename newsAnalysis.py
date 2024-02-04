@@ -91,40 +91,38 @@ print("Initializing Langchain components...")
 llm = ChatOpenAI(openai_api_key=os.environ.get("OPEN_API_KEY"), model="gpt-4")
 output_parser = StrOutputParser()
 
-print("Loading articles from JSON...")
-with open("./output.json", encoding="utf8") as file:
-    articles = json.load(file)
+def update_region_sentiment():
+    print("Initializing Langchain components...")
+    llm = ChatOpenAI(openai_api_key='Open_AI_API', model="gpt-4")
+    output_parser = StrOutputParser()
 
-print("Preparing titles for filtering...")
-titles = [{"id": article["id"], "title": article["title"]} for article in articles]
+    print("Loading articles from JSON...")
+    with open("./output.json", encoding="utf8") as file:
+        articles = json.load(file)
 
-print("Defining and invoking filter chain...")
-filterPrompt = ChatPromptTemplate.from_messages([
-    ("system", "Filter this list to only include entries which could have any geopolitical impact on the price of oil."),
-    ("user", "{filterInput}" + "output in original json format.")
-])
-filterChain = filterPrompt | llm | output_parser
-filterOut = filterChain.invoke({"filterInput": json.dumps(titles)})
-filteredList = json.loads(filterOut)
+    print("Preparing titles for filtering...")
+    titles = [{"id": article["id"], "title": article["title"]} for article in articles]
 
-print("Compiling a list of filtered articles...")
-filteredIndexes = [int(article["id"]) for article in filteredList]
-filteredArticles = [article for article in articles if article["id"] in filteredIndexes]
-print(f"Number of articles after filtering: {len(filteredArticles)}")
+    print("Defining and invoking filter chain...")
+    filterPrompt = ChatPromptTemplate.from_messages([
+        ("system", "Filter this list to only include entries which could have any geopolitical impact on the price of oil."),
+        ("user", "{filterInput}" + "output in original json format.")
+    ])
+    filterChain = filterPrompt | llm | output_parser
+    filterOut = filterChain.invoke({"filterInput": json.dumps(titles)})
+    filteredList = json.loads(filterOut)
 
 print("Updating filtered articles with summaries...")
 summarisedInput = update_json_with_summaries(filteredArticles)
 
-print("Defining sentiment analysis prompt and chain...")
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "Give me geopolitical sentiment indexes to 3 decimal places ranging from -1 to 1 continuous values for a financial analyst interested in oil."),
-    ("system", "Give me the countries that each sentiment is referring to. Provide the output in JSON form id: , countries: [], sentiment indexes: []"),
-    ("user", "{input}")
-])
-chain = prompt | llm | output_parser
+    print("Updating filtered articles with summaries...")
+    update_json_with_summaries(filteredArticles)
 
 print("Invoking sentiment analysis chain with filtered and summarized articles...")
 output = chain.invoke({"input": json.dumps(summarisedInput)})
 
-print("Final output:")
-print(output)
+    print("Invoking sentiment analysis chain with filtered and summarized articles...")
+    output = chain.invoke({"input": json.dumps(filteredArticles)})
+
+    print("Final output:")
+    print(output)

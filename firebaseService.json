@@ -1,0 +1,11 @@
+{
+  "type": "service_account",
+  "apiKey": "AIzaSyBwCgGlbleJfvPsyjAOFFmMb0IVFUmLFmk",
+  "authDomain": "geosense-ai.firebaseapp.com",
+  "databaseURL": "https://geosense-ai-default-rtdb.europe-west1.firebasedatabase.app",
+  "projectId": "geosense-ai",
+  "storageBucket": "geosense-ai.appspot.com",
+  "messagingSenderId": "14481715630",
+  "appId": "1:14481715630:web:21c58470d57921d41ed83f",
+  "measurementId": "G-D7WZR0Z8RS"
+}
