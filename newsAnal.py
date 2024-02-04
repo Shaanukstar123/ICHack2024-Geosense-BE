@@ -3,7 +3,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import json
 
-llm = ChatOpenAI(openai_api_key="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")
+llm = ChatOpenAI(openai_api_key="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", model="gpt-3.5-turbo-0125")
+
 output_parser = StrOutputParser()
 
 file = open("testInput.json")
@@ -28,6 +29,6 @@ prompt = ChatPromptTemplate.from_messages([
 ])
 chain = prompt | llm | output_parser
 
-output = chain.invoke({"input": "id: 543, content: Ireland will leave the union, and Scotland could too. True devolution is the only way to save it."})
+output = chain.invoke({"input": input})
 
 print(output)
