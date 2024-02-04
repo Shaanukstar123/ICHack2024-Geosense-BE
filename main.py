@@ -5,8 +5,8 @@ app = Flask(__name__)
 
 # Sample data
 articles_data = {
-    "US": [4.5, "Summary of an article related to the US."],
-    "CA": [3.2, "Summary of an article related to Canada."]
+    "US": {"4.5", "Summary of an article related to the US."},
+    "CA": {"3.2", "Summary of an article related to Canada."}
 }
 
 @app.route('/country_data', methods=['GET'])

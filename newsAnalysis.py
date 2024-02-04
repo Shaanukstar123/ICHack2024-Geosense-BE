@@ -70,16 +70,26 @@ from summariser.summariser import summarise_text
 
 def update_json_with_summaries(articles):
     print("Starting summarization...")
+    count = 0
+    articles = []
     for article in articles:
+        if count >= 5:
+            break
         try:
             print(f"Summarizing article ID: {article['id']}")
             summary = summarise_text(article['content'])
-            article['summary'] = summary
+            article['content'] = summary
             print(f"Summary for article ID: {article['id']} completed")
+            articles.append(article)
+            count += 1
         except Exception as e:
             print(f"Error summarizing article ID: {article['id']}: {e}")
-            article['summary'] = "Summary unavailable"
+            article['content'] = "Summary unavailable"
+    return articles
 
+print("Initializing Langchain components...")
+llm = ChatOpenAI(openai_api_key=os.environ.get("OPEN_API_KEY"), model="gpt-4")
+output_parser = StrOutputParser()
 
 def update_region_sentiment():
     print("Initializing Langchain components...")
@@ -102,21 +112,14 @@ def update_region_sentiment():
     filterOut = filterChain.invoke({"filterInput": json.dumps(titles)})
     filteredList = json.loads(filterOut)
 
-    print("Compiling a list of filtered articles...")
-    filteredIndexes = [int(article["id"]) for article in filteredList]
-    filteredArticles = [article for article in articles if article["id"] in filteredIndexes]
-    print(f"Number of articles after filtering: {len(filteredArticles)}")
+print("Updating filtered articles with summaries...")
+summarisedInput = update_json_with_summaries(filteredArticles)
 
     print("Updating filtered articles with summaries...")
     update_json_with_summaries(filteredArticles)
 
-    print("Defining sentiment analysis prompt and chain...")
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "Give me geopolitical sentiment indexes to 3 decimal places ranging from -1 to 1 continuous values for a financial analyst interested in oil."),
-        ("system", "Give me the countries that each sentiment is referring to. Provide the output in JSON form id: , countries: [], sentiment indexes: []"),
-        ("user", "{input}")
-    ])
-    chain = prompt | llm | output_parser
+print("Invoking sentiment analysis chain with filtered and summarized articles...")
+output = chain.invoke({"input": json.dumps(summarisedInput)})
 
     print("Invoking sentiment analysis chain with filtered and summarized articles...")
     output = chain.invoke({"input": json.dumps(filteredArticles)})
