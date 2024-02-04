@@ -7,7 +7,7 @@ llm = ChatOpenAI(openai_api_key=os.getenv('OPENAI_API_KEY'), model="gpt-3.5-turb
 
 output_parser = StrOutputParser()
 
-file = open("./webCrawler/output.json")
+file = open("./webCrawler/output.json", encoding="utf8")
 input = json.load(file)
 file.close()
 
@@ -18,9 +18,11 @@ filterPrompt = ChatPromptTemplate.from_messages([
 ])
 filterChain = filterPrompt | llm | output_parser
 
-filteredList = json.load(filterChain.invoke({"filterInput": json.dumps(titles)}))
+filterOut = filterChain.invoke({"filterInput": json.dumps(titles)})
+print(filterOut)
+filteredList = json.loads(filterOut)
 print(filteredList)
-filteredIndexes = [article["id"] for article in filteredList]
+filteredIndexes = [int(article["id"]) for article in filteredList]
 print(filteredIndexes)
 filteredInput = json.dumps([article for article in input if article["id"] in filteredIndexes])
 
