@@ -38,6 +38,7 @@ def run_spider():
                 'format': 'json',
                 'encoding': 'utf8',
                 'indent': 4,
+                'overwrite': True,  # Ensure the file is overwritten each time
             },
         },
     })
