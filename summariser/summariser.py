@@ -38,8 +38,8 @@ def update_json_with_summaries(json_file):
     with open(json_file, 'w', encoding='utf-8') as file:
         json.dump(articles, file, indent=4, ensure_ascii=False)
 
-json_file = 'output.json' 
-update_json_with_summaries(json_file)
+# json_file = 'output.json' 
+# update_json_with_summaries(json_file)
 
 # {"2 character country string": [float -1 to 1, summary],
 
