@@ -70,18 +70,25 @@ from summariser.summariser import summarise_text
 
 def update_json_with_summaries(articles):
     print("Starting summarization...")
+    count = 0
+    articles = []
     for article in articles:
+        if count >= 5:
+            break
         try:
             print(f"Summarizing article ID: {article['id']}")
             summary = summarise_text(article['content'])
-            article['summary'] = summary
+            article['content'] = summary
             print(f"Summary for article ID: {article['id']} completed")
+            articles.append(article)
+            count += 1
         except Exception as e:
             print(f"Error summarizing article ID: {article['id']}: {e}")
-            article['summary'] = "Summary unavailable"
+            article['content'] = "Summary unavailable"
+    return articles
 
 print("Initializing Langchain components...")
-llm = ChatOpenAI(openai_api_key='Open_AI_API', model="gpt-4")
+llm = ChatOpenAI(openai_api_key=os.environ.get("OPEN_API_KEY"), model="gpt-4")
 output_parser = StrOutputParser()
 
 print("Loading articles from JSON...")
@@ -106,7 +113,7 @@ filteredArticles = [article for article in articles if article["id"] in filtered
 print(f"Number of articles after filtering: {len(filteredArticles)}")
 
 print("Updating filtered articles with summaries...")
-update_json_with_summaries(filteredArticles)
+summarisedInput = update_json_with_summaries(filteredArticles)
 
 print("Defining sentiment analysis prompt and chain...")
 prompt = ChatPromptTemplate.from_messages([
@@ -117,7 +124,7 @@ prompt = ChatPromptTemplate.from_messages([
 chain = prompt | llm | output_parser
 
 print("Invoking sentiment analysis chain with filtered and summarized articles...")
-output = chain.invoke({"input": json.dumps(filteredArticles)})
+output = chain.invoke({"input": json.dumps(summarisedInput)})
 
 print("Final output:")
 print(output)
